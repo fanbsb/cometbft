@@ -42,6 +42,15 @@ func validateBlock(state State, block *types.Block) error {
 			block.Height,
 		)
 	}
+	// Fetch ETH Height
+	outsideETHHeight := int64(999) //TODO fetch outside
+	if block.ETHHeight > outsideETHHeight {
+		return fmt.Errorf("wrong Block.Header.ETHHeight. Expected greater or equal to %v, got %v",
+			block.ETHHeight,
+			outsideETHHeight,
+		)
+	}
+
 	// Validate prev block info.
 	if !block.LastBlockID.Equals(state.LastBlockID) {
 		return fmt.Errorf("wrong Block.Header.LastBlockID.  Expected %v, got %v",

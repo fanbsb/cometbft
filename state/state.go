@@ -259,6 +259,9 @@ func (state State) MakeBlock(
 		proposerAddress,
 	)
 
+	// Set ETH height
+	block.ETHHeight = 999
+
 	return block
 }
 
