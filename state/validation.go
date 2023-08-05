@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/types"
@@ -43,8 +44,9 @@ func validateBlock(state State, block *types.Block) error {
 		)
 	}
 	// Fetch ETH Height
-	outsideETHHeight := int64(999) //TODO fetch outside
-	if block.ETHHeight > outsideETHHeight {
+	outsideETHHeight := state.fetchEthereumHeight()
+	if block.ETHHeight == 0 || outsideETHHeight == 0 || block.ETHHeight > outsideETHHeight {
+		log.Println("eth height not pass", block.ETHHeight)
 		return fmt.Errorf("wrong Block.Header.ETHHeight. Expected greater or equal to %v, got %v",
 			block.ETHHeight,
 			outsideETHHeight,

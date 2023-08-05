@@ -323,11 +323,10 @@ func MaxDataBytesNoEvidence(maxBytes int64, valsCount int) int64 {
 // - https://github.com/cometbft/cometbft/blob/v0.38.x/spec/blockchain/blockchain.md
 type Header struct {
 	// basic block info
-	Version   cmtversion.Consensus `json:"version"`
-	ChainID   string               `json:"chain_id"`
-	Height    int64                `json:"height"`
-	ETHHeight int64                `json:"eth_height"`
-	Time      time.Time            `json:"time"`
+	Version cmtversion.Consensus `json:"version"`
+	ChainID string               `json:"chain_id"`
+	Height  int64                `json:"height"`
+	Time    time.Time            `json:"time"`
 
 	// prev block info
 	LastBlockID BlockID `json:"last_block_id"`
@@ -348,6 +347,8 @@ type Header struct {
 	// consensus info
 	EvidenceHash    cmtbytes.HexBytes `json:"evidence_hash"`    // evidence included in the block
 	ProposerAddress Address           `json:"proposer_address"` // original proposer of the block
+
+	ETHHeight int64 `json:"eth_height"`
 }
 
 // Populate the Header with state-derived data.
@@ -535,7 +536,7 @@ func (h *Header) ToProto() *cmtproto.Header {
 		LastResultsHash:    h.LastResultsHash,
 		LastCommitHash:     h.LastCommitHash,
 		ProposerAddress:    h.ProposerAddress,
-		ETHHeight:          h.ETHHeight,
+		EthHeight:          h.ETHHeight,
 	}
 }
 
@@ -568,7 +569,7 @@ func HeaderFromProto(ph *cmtproto.Header) (Header, error) {
 	h.LastResultsHash = ph.LastResultsHash
 	h.LastCommitHash = ph.LastCommitHash
 	h.ProposerAddress = ph.ProposerAddress
-	h.ETHHeight = ph.ETHHeight
+	h.ETHHeight = ph.EthHeight
 
 	return *h, h.ValidateBasic()
 }

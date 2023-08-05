@@ -3,6 +3,7 @@ package node
 import (
 	"context"
 	"fmt"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"net"
 	"net/http"
 	"time"
@@ -244,6 +245,9 @@ func NewNodeWithContext(ctx context.Context,
 	blockSync := !onlyValidatorIsUs(state, pubKey)
 
 	logNodeStartupInfo(state, pubKey, logger, consensusLogger)
+
+	// Add EthClient to sm.State
+	state.Client, _ = ethclient.Dial(config.EthURL)
 
 	// Make MempoolReactor
 	mempool, mempoolReactor := createMempoolAndMempoolReactor(config, proxyApp, state, memplMetrics, logger)

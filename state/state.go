@@ -2,8 +2,10 @@ package state
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/cometbft/cometbft/types"
 	cmttime "github.com/cometbft/cometbft/types/time"
 	"github.com/cometbft/cometbft/version"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 // database keys
@@ -77,6 +80,8 @@ type State struct {
 
 	// the latest AppHash we've received from calling abci.Commit()
 	AppHash []byte
+
+	Client *ethclient.Client
 }
 
 // Copy makes a copy of the State for mutating.
@@ -102,6 +107,8 @@ func (state State) Copy() State {
 		AppHash: state.AppHash,
 
 		LastResultsHash: state.LastResultsHash,
+
+		Client: state.Client,
 	}
 }
 
@@ -260,7 +267,7 @@ func (state State) MakeBlock(
 	)
 
 	// Set ETH height
-	block.ETHHeight = 999
+	block.ETHHeight = state.fetchEthereumHeight()
 
 	return block
 }
@@ -355,4 +362,15 @@ func MakeGenesisState(genDoc *types.GenesisDoc) (State, error) {
 
 		AppHash: genDoc.AppHash,
 	}, nil
+}
+
+func (state *State) fetchEthereumHeight() int64 {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if height, err := state.Client.BlockNumber(ctx); err != nil {
+		log.Println("fetch ethereum height error", err)
+		return 0
+	} else {
+		return int64(height)
+	}
 }
